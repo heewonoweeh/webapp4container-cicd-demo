@@ -1,0 +1,39 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  buildNumber: 0.0.$(Build.BuildId)
+
+steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'zeroacrdemo'
+    repository: 'wa4container-demo'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(buildNumber)
+      latest
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: 'sed -i "s/latest/$(buildNumber)/g" k8s/wa4c-deployment.yaml'
