@@ -21,7 +21,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)'
 
 - task: Docker@2
   inputs:
