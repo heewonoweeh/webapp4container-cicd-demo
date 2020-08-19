@@ -37,3 +37,9 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'sed -i "s/latest/$(buildNumber)/g" k8s/wa4c-deployment.yaml'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
